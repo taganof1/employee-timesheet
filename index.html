@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFC Clocking System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen">
+        <h1>Welcome to the NFC Clocking System</h1>
+        <p>Please tap your RFID card to clock in or out.</p>
+        <button id="tapCardBtn">Tap Your Card</button>
+    </div>
+
+    <!-- Success/Failure Screen -->
+    <div id="resultScreen" style="display: none;">
+        <p id="resultMessage"></p>
+        <div id="employeeDetails" style="display: none;">
+            <h2>Employee Details:</h2>
+            <p id="empName"></p>
+            <p id="empID"></p>
+            <p id="empPosition"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
