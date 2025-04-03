@@ -94,8 +94,8 @@
         function showErrorState(message) {
             statusCard.classList.remove('success');
             statusCard.classList.add('error');
-            statusCard.querySelector('.card-icon').className = 'fas fa-times-circle card-icon text-danger';
-            statusCard.querySelector('.card-title').textContent = 'Error';
+            statusCard.querySelector('.card-icon').className = 'fas fa-exclamation-circle card-icon text-danger';
+            statusCard.querySelector('.card-title').textContent = 'Access Denied';
             statusCard.querySelector('.card-text').textContent = message;
             employeeInfo.classList.remove('show');
 
@@ -109,17 +109,20 @@
             
             // Skip if we've already processed this clock-in
             if (lastProcessedTime && data.clockedInAt === lastProcessedTime) {
+                console.log('Skipping already processed clock-in:', lastProcessedTime);
                 return;
             }
 
             // Handle error state
             if (data.status === 'error') {
+                console.log('Showing error state:', data.message);
                 showErrorState(data.message);
                 return;
             }
 
             // Handle success state
             if (data.uid) {
+                console.log('Processing successful clock-in for UID:', data.uid);
                 // Update last processed time
                 lastProcessedTime = data.clockedInAt;
 
@@ -137,11 +140,14 @@
 
                 // Return to welcome screen after 5 seconds
                 setTimeout(showWelcomeScreen, 5000);
+            } else {
+                console.log('No UID in data:', data);
             }
         }
 
         // Poll for new clock-in events
         function pollForUpdates() {
+            console.log('Polling for updates...');
             fetch('fetch-clockin-data.php')
                 .then(response => {
                     console.log('Response status:', response.status); // Debug log

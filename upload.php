@@ -1,16 +1,5 @@
 <?php
-$servername = "localhost";
-$username = "clockadmin";
-$password = "[7]7JCweetDb9o)X";
-$dbname = "clocking_system";
-
-// Connect to MySQL
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check for connection errors
-if ($conn->connect_error) {
-    die("Database connection failed: " . $conn->connect_error);
-}
+include 'db_connection.php';
 
 // Check if UID is sent
 if (!isset($_POST['uid'])) {
