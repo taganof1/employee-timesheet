@@ -22,12 +22,12 @@ if (!file_exists($filePath)) {
 
 $rows = array_map('str_getcsv', file($filePath));
 
-// Skip header row
+// Skip first row
 array_shift($rows);
 
 $found = false;
 foreach ($rows as $row) {
-    // Remove quotes from UID if they exist
+    // Remove quotations from UID for continuity
     $csvUid = trim($row[0], '"');
     if ($csvUid === $uid) {
         $found = true;
@@ -40,6 +40,7 @@ foreach ($rows as $row) {
     }
 }
 
+// Error handling
 if (!$found) {
     echo json_encode([
         'status' => 'error',

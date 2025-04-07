@@ -1,3 +1,4 @@
+<!--Frontend page for employees to see when capturing attendance -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,40 +7,7 @@
     <title>Employee Clock-In System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .clock-in-container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        .status-card {
-            transition: all 0.3s ease;
-        }
-        .status-card.success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-        }
-        .status-card.error {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-        }
-        .employee-info {
-            display: none;
-        }
-        .employee-info.show {
-            display: block;
-        }
-        .card-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -72,104 +40,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const statusCard = document.querySelector('.status-card');
-        const employeeInfo = document.querySelector('.employee-info');
-        const employeeIdSpan = document.getElementById('employeeId');
-        const employeeNameSpan = document.getElementById('employeeName');
-        const clockInTimeSpan = document.getElementById('clockInTime');
-
-        let lastProcessedTime = null; // Track the last processed clock-in time
-
-        // Function to show welcome screen
-        function showWelcomeScreen() {
-            statusCard.classList.remove('success', 'error');
-            statusCard.querySelector('.card-icon').className = 'fas fa-id-card card-icon text-primary';
-            statusCard.querySelector('.card-title').textContent = 'Ready to Clock In';
-            statusCard.querySelector('.card-text').textContent = 'Please tap your RFID card on the reader';
-            employeeInfo.classList.remove('show');
-        }
-
-        // Function to show error state
-        function showErrorState(message) {
-            statusCard.classList.remove('success');
-            statusCard.classList.add('error');
-            statusCard.querySelector('.card-icon').className = 'fas fa-exclamation-circle card-icon text-danger';
-            statusCard.querySelector('.card-title').textContent = 'Access Denied';
-            statusCard.querySelector('.card-text').textContent = message;
-            employeeInfo.classList.remove('show');
-
-            // Return to welcome screen after 3 seconds
-            setTimeout(showWelcomeScreen, 3000);
-        }
-
-        // Function to update the UI with employee data
-        function updateEmployeeInfo(data) {
-            console.log('Received data:', data); // Debug log
-            
-            // Skip if we've already processed this clock-in
-            if (lastProcessedTime && data.clockedInAt === lastProcessedTime) {
-                console.log('Skipping already processed clock-in:', lastProcessedTime);
-                return;
-            }
-
-            // Handle error state
-            if (data.status === 'error') {
-                console.log('Showing error state:', data.message);
-                showErrorState(data.message);
-                return;
-            }
-
-            // Handle success state
-            if (data.uid) {
-                console.log('Processing successful clock-in for UID:', data.uid);
-                // Update last processed time
-                lastProcessedTime = data.clockedInAt;
-
-                statusCard.classList.remove('error');
-                statusCard.classList.add('success');
-                statusCard.querySelector('.card-icon').className = 'fas fa-check-circle card-icon text-success';
-                statusCard.querySelector('.card-title').textContent = 'Successfully Clocked In!';
-                statusCard.querySelector('.card-text').textContent = 'Your clock-in has been recorded';
-
-                employeeIdSpan.textContent = data.employeeId;
-                employeeNameSpan.textContent = data.employeeName;
-                clockInTimeSpan.textContent = new Date(data.clockedInAt).toLocaleString();
-                
-                employeeInfo.classList.add('show');
-
-                // Return to welcome screen after 5 seconds
-                setTimeout(showWelcomeScreen, 5000);
-            } else {
-                console.log('No UID in data:', data);
-            }
-        }
-
-        // Poll for new clock-in events
-        function pollForUpdates() {
-            console.log('Polling for updates...');
-            fetch('fetch-clockin-data.php')
-                .then(response => {
-                    console.log('Response status:', response.status); // Debug log
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Fetched data:', data); // Debug log
-                    updateEmployeeInfo(data);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error); // Debug log
-                })
-                .finally(() => {
-                    setTimeout(pollForUpdates, 1000); // Poll every second
-                });
-        }
-
-        // Start polling when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            showWelcomeScreen(); // Show welcome screen initially
-            pollForUpdates();
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html> 
