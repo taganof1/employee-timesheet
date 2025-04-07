@@ -3,9 +3,9 @@ import requests
 import time
 
 # --- Configuration ---
-SERIAL_PORT = 'COM3'  # Change to match arduino port
+SERIAL_PORT = 'COM3'  # Change this to match your Arduino's port
 BAUD_RATE = 115200
-PHP_ENDPOINT = 'http://localhost/clocking-system/upload.php'  # Link to send data to
+PHP_ENDPOINT = 'http://localhost/clocking-system/upload.php'  # Endpoint to send data
 
 # --- Start serial connection ---
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)

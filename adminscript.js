@@ -1,4 +1,4 @@
-/* GET table data from database */
+/* script.js */
 function fetchClockInData() {
     fetch('fetch-clockin-data.php')
         .then(response => response.text())

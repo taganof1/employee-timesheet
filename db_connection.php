@@ -1,5 +1,5 @@
 <?php
-// Read config.json
+// Read configuration from JSON file
 $configFile = __DIR__ . '/config.json';
 if (!file_exists($configFile)) {
     die("Configuration file not found");
@@ -10,13 +10,13 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     die("Error reading configuration file");
 }
 
-// Pull config.json data
+// Extract database configuration
 $dbConfig = $config['database'] ?? null;
 if (!$dbConfig) {
     die("Database configuration not found");
 }
 
-// SQL connection
+// Connect to MySQL
 $conn = new mysqli(
     $dbConfig['host'],
     $dbConfig['username'],
@@ -24,7 +24,7 @@ $conn = new mysqli(
     $dbConfig['dbname']
 );
 
-// Error handling
+// Check for connection errors
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);
 }

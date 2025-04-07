@@ -1,9 +1,8 @@
 <?php
 header('Content-Type: application/json');
-// Required to connect to db
 include 'db_connection.php';
 
-// heck if employee exists in data.csv
+// Function to check if employee exists in data.csv
 function checkEmployeeExists($uid) {
     $filePath = __DIR__ . '/employee-data/data.csv';
     if (!file_exists($filePath)) {
@@ -12,7 +11,7 @@ function checkEmployeeExists($uid) {
     }
 
     $rows = array_map('str_getcsv', file($filePath));
-    array_shift($rows); // Skip first row
+    array_shift($rows); // Skip header row
 
     foreach ($rows as $row) {
         $csvUid = trim($row[0], '"');
@@ -20,7 +19,6 @@ function checkEmployeeExists($uid) {
             return true;
         }
     }
-    // Error handling
     error_log("UID not found in data.csv: " . $uid);
     return false;
 }
@@ -61,7 +59,6 @@ if ($result->num_rows > 0) {
         echo json_encode($response);
     }
 } else {
-    // Error handling
     $response = [
         'status' => 'error',
         'message' => 'No recent clock-in records found',

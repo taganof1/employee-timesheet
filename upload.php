@@ -1,21 +1,21 @@
 <?php
 include 'db_connection.php';
 
-// Check UID is sent
+// Check if UID is sent
 if (!isset($_POST['uid'])) {
     die(json_encode(["status" => "error", "message" => "No UID received"]));
 }
 
 $uid = $_POST['uid'];
 
-// Read data from CSV
-$csvFile = __DIR__ . "/employee-data/data.csv";
+// Read employee data from the CSV
+$csvFile = __DIR__ . "/employee-data/data.csv"; // Ensure this file exists!
 $employeeData = array_map('str_getcsv', file($csvFile));
 
-// Find employee from UID
+// Find the employee by UID
 $found = false;
 foreach ($employeeData as $row) {
-    if ($row[0] === $uid) {
+    if ($row[0] === $uid) { // UID matches
         $employee_id = $row[1];
         $first_name = $row[2];
         $last_name = $row[3];
@@ -36,7 +36,7 @@ foreach ($employeeData as $row) {
     }
 }
 
-// Error handling if UID not found
+// If no matching UID was found
 if (!$found) {
     echo json_encode(["status" => "error", "message" => "UID not found in employee records"]);
 }
