@@ -3,13 +3,22 @@
 
 #define PN532_IRQ   (2)
 #define PN532_RESET (3)  // Not always needed, but define it anyway
+#define BUTTON_PIN  (4)  // Button pin for mode switching
 
 Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
+
+// Mode tracking
+bool clockInMode = true;  // Default to clock-in mode
+unsigned long lastButtonPress = 0;
+const unsigned long DEBOUNCE_DELAY = 300;  // Debounce time in milliseconds
 
 void setup(void) {
   Serial.begin(115200);
   while (!Serial);
   Serial.println("Initializing PN532 NFC reader in I2C mode...");
+
+  // Set up button pin
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   nfc.begin();
 
@@ -27,14 +36,36 @@ void setup(void) {
 
   nfc.SAMConfig(); // Configure board to read RFID tags
   Serial.println("Waiting for an NFC card or smartphone...");
+  
+  // Send initial mode
+  Serial.print("MODE:");
+  Serial.println(clockInMode ? "clockIn" : "clockOut");
 }
 
 void loop(void) {
+  // Check for button press to switch modes
+  if (digitalRead(BUTTON_PIN) == LOW) {
+    unsigned long currentTime = millis();
+    if (currentTime - lastButtonPress > DEBOUNCE_DELAY) {
+      lastButtonPress = currentTime;
+      
+      // Toggle mode
+      clockInMode = !clockInMode;
+      
+      // Send mode change to Python script
+      Serial.print("MODE:");
+      Serial.println(clockInMode ? "clockIn" : "clockOut");
+      
+      // Visual feedback (optional - if you have an LED)
+      // digitalWrite(LED_PIN, clockInMode ? HIGH : LOW);
+    }
+  }
+
   uint8_t uid[7]; // Buffer to store UID
   uint8_t uidLength;
 
   if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
-    Serial.print("Card detected with UID: ");
+    Serial.print("UID Value: ");
     for (uint8_t i = 0; i < uidLength; i++) {
       Serial.print(uid[i] < 0x10 ? "0" : "");
       Serial.print(uid[i], HEX);

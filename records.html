@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Records - Clocking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .records-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .table-responsive {
+            margin-top: 20px;
+        }
+        .back-button {
+            margin-bottom: 20px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .records-content {
+            display: none;
+        }
+        .records-content.show {
+            display: block;
+        }
+        .login-form.show {
+            display: block;
+        }
+        .login-form.hide {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-form" id="loginForm">
+            <h2 class="text-center mb-4">Authentication Required</h2>
+            <div class="alert alert-danger" id="errorMessage" style="display: none;"></div>
+            <form id="passwordForm" onsubmit="return verifyPassword(event)">
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <a href="index.html" class="btn btn-secondary">Back to Clock-In</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Records Content -->
+        <div class="records-container records-content" id="recordsContent">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0">Employee Records</h1>
+                <div>
+                    <button class="btn btn-danger me-2" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Clock-In
+                    </a>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>UID</th>
+                            <th>Employee ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Clocked In At</th>
+                            <th>Clocked Out At</th>
+                            <th>Shift Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTableBody">
+                        <!-- Records will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function verifyPassword(event) {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            fetch('fetch_records.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('loginForm').classList.remove('show');
+                    document.getElementById('loginForm').classList.add('hide');
+                    document.getElementById('recordsContent').classList.add('show');
+                    loadRecords();
+                } else {
+                    errorMessage.textContent = data.message || 'Invalid password';
+                    errorMessage.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.style.display = 'block';
+            });
+
+            return false;
+        }
+
+        function logout() {
+            fetch('logout.php')
+            .then(() => {
+                document.getElementById('loginForm').classList.remove('hide');
+                document.getElementById('loginForm').classList.add('show');
+                document.getElementById('recordsContent').classList.remove('show');
+                document.getElementById('password').value = '';
+                document.getElementById('errorMessage').style.display = 'none';
+            });
+        }
+
+        function loadRecords() {
+            fetch('fetch_records.php')
+                .then(response => {
+                    if (response.status === 401) {
+                        throw new Error('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tableBody = document.getElementById('recordsTableBody');
+                    tableBody.innerHTML = '';
+                    
+                    data.forEach(record => {
+                        const row = document.createElement('tr');
+                        const clockInTime = new Date(record.clocked_in_at);
+                        const clockOutTime = record.clocked_out_at ? new Date(record.clocked_out_at) : null;
+                        
+                        // Calculate shift duration if clocked out
+                        let duration = '';
+                        if (clockOutTime) {
+                            const diffMs = clockOutTime - clockInTime;
+                            const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+                            const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                            duration = `${diffHrs}h ${diffMins}m`;
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${record.id}</td>
+                            <td>${record.uid}</td>
+                            <td>${record.employee_id}</td>
+                            <td>${record.first_name}</td>
+                            <td>${record.last_name}</td>
+                            <td>${clockInTime.toLocaleString()}</td>
+                            <td>${clockOutTime ? clockOutTime.toLocaleString() : 'Not clocked out'}</td>
+                            <td>${duration || 'In progress'}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    if (error.message === 'Unauthorized') {
+                        document.getElementById('loginForm').classList.remove('hide');
+                        document.getElementById('loginForm').classList.add('show');
+                        document.getElementById('recordsContent').classList.remove('show');
+                        document.getElementById('errorMessage').textContent = 'Session expired. Please login again.';
+                        document.getElementById('errorMessage').style.display = 'block';
+                    } else {
+                        console.error('Error loading records:', error);
+                        alert('Error loading records. Please try again later.');
+                    }
+                });
+        }
+    </script>
+</body>
+</html> 

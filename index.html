@@ -39,6 +39,21 @@
             font-size: 3rem;
             margin-bottom: 1rem;
         }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .action-button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            min-width: 200px;
+        }
+        .action-button.active {
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -46,10 +61,19 @@
         <div class="clock-in-container">
             <h1 class="text-center mb-4">Employee Clock-In System</h1>
             
+            <div class="action-buttons">
+                <button id="clockInBtn" class="btn btn-primary action-button active" onclick="setAction('clockIn')">
+                    <i class="fas fa-sign-in-alt"></i> Clock In
+                </button>
+                <button id="clockOutBtn" class="btn btn-danger action-button" onclick="setAction('clockOut')">
+                    <i class="fas fa-sign-out-alt"></i> Clock Out
+                </button>
+            </div>
+            
             <div class="card status-card mb-4">
                 <div class="card-body text-center">
                     <i class="fas fa-id-card card-icon text-primary"></i>
-                    <h3 class="card-title">Ready to Clock In</h3>
+                    <h3 class="card-title" id="actionTitle">Ready to Clock In</h3>
                     <p class="card-text">Please tap your RFID card on the reader</p>
                 </div>
             </div>
@@ -66,7 +90,14 @@
                         </div>
                     </div>
                     <p><strong>Time:</strong> <span id="clockInTime"></span></p>
+                    <p><strong>Status:</strong> <span id="clockStatus"></span></p>
                 </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="records.html" class="btn btn-primary">
+                    <i class="fas fa-list"></i> View All Records
+                </a>
             </div>
         </div>
     </div>
@@ -78,14 +109,60 @@
         const employeeIdSpan = document.getElementById('employeeId');
         const employeeNameSpan = document.getElementById('employeeName');
         const clockInTimeSpan = document.getElementById('clockInTime');
+        const actionTitle = document.getElementById('actionTitle');
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
 
         let lastProcessedTime = null; // Track the last processed clock-in time
+        let currentAction = 'clockIn'; // Default action is clock in
+
+        // Function to set the current action (clock in or clock out)
+        function setAction(action) {
+            currentAction = action;
+            
+            // Update button styles
+            if (action === 'clockIn') {
+                clockInBtn.classList.add('active');
+                clockOutBtn.classList.remove('active');
+                actionTitle.textContent = 'Ready to Clock In';
+                statusCard.querySelector('.card-icon').className = 'fas fa-sign-in-alt card-icon text-primary';
+            } else {
+                clockInBtn.classList.remove('active');
+                clockOutBtn.classList.add('active');
+                actionTitle.textContent = 'Ready to Clock Out';
+                statusCard.querySelector('.card-icon').className = 'fas fa-sign-out-alt card-icon text-danger';
+            }
+            
+            // Send mode change to the server
+            fetch('set_mode.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ mode: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Mode set to:', action, data);
+            })
+            .catch(error => {
+                console.error('Error setting mode:', error);
+            });
+        }
 
         // Function to show welcome screen
         function showWelcomeScreen() {
             statusCard.classList.remove('success', 'error');
-            statusCard.querySelector('.card-icon').className = 'fas fa-id-card card-icon text-primary';
-            statusCard.querySelector('.card-title').textContent = 'Ready to Clock In';
+            
+            // Set icon based on current action
+            if (currentAction === 'clockIn') {
+                statusCard.querySelector('.card-icon').className = 'fas fa-sign-in-alt card-icon text-primary';
+                actionTitle.textContent = 'Ready to Clock In';
+            } else {
+                statusCard.querySelector('.card-icon').className = 'fas fa-sign-out-alt card-icon text-danger';
+                actionTitle.textContent = 'Ready to Clock Out';
+            }
+            
             statusCard.querySelector('.card-text').textContent = 'Please tap your RFID card on the reader';
             employeeInfo.classList.remove('show');
         }
@@ -128,13 +205,28 @@
 
                 statusCard.classList.remove('error');
                 statusCard.classList.add('success');
-                statusCard.querySelector('.card-icon').className = 'fas fa-check-circle card-icon text-success';
-                statusCard.querySelector('.card-title').textContent = 'Successfully Clocked In!';
-                statusCard.querySelector('.card-text').textContent = 'Your clock-in has been recorded';
+                
+                if (currentAction === 'clockIn') {
+                    // Handle clock-in
+                    statusCard.querySelector('.card-icon').className = 'fas fa-check-circle card-icon text-success';
+                    statusCard.querySelector('.card-title').textContent = 'Successfully Clocked In!';
+                    statusCard.querySelector('.card-text').textContent = 'Your clock-in has been recorded';
 
-                employeeIdSpan.textContent = data.employeeId;
-                employeeNameSpan.textContent = data.employeeName;
-                clockInTimeSpan.textContent = new Date(data.clockedInAt).toLocaleString();
+                    employeeIdSpan.textContent = data.employeeId;
+                    employeeNameSpan.textContent = data.employeeName;
+                    clockInTimeSpan.textContent = new Date(data.clockedInAt).toLocaleString();
+                    document.getElementById('clockStatus').textContent = 'Clocked In';
+                } else {
+                    // Handle clock-out
+                    statusCard.querySelector('.card-icon').className = 'fas fa-check-circle card-icon text-success';
+                    statusCard.querySelector('.card-title').textContent = 'Successfully Clocked Out!';
+                    statusCard.querySelector('.card-text').textContent = 'Your clock-out has been recorded';
+
+                    employeeIdSpan.textContent = data.employeeId;
+                    employeeNameSpan.textContent = data.employeeName;
+                    clockInTimeSpan.textContent = new Date(data.clockedOutAt).toLocaleString();
+                    document.getElementById('clockStatus').textContent = 'Clocked Out';
+                }
                 
                 employeeInfo.classList.add('show');
 
@@ -145,10 +237,14 @@
             }
         }
 
-        // Poll for new clock-in events
+        // Poll for new clock-in/out events
         function pollForUpdates() {
             console.log('Polling for updates...');
-            fetch('fetch-clockin-data.php')
+            
+            // Determine which endpoint to call based on current action
+            const endpoint = currentAction === 'clockIn' ? 'fetch-clockin-data.php' : 'clock_out.php';
+            
+            fetch(endpoint)
                 .then(response => {
                     console.log('Response status:', response.status); // Debug log
                     return response.json();
