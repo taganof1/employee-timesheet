@@ -1,5 +1,5 @@
 <?php
-include 'db_connection.php';
+include '../includes/db_connection.php';
 
 // Check if UID is sent
 if (!isset($_POST['uid'])) {
@@ -9,7 +9,7 @@ if (!isset($_POST['uid'])) {
 $uid = $_POST['uid'];
 
 // Read employee data from the CSV
-$csvFile = __DIR__ . "/employee-data/data.csv"; // Ensure this file exists!
+$csvFile = __DIR__ . "/../employee-data/data.csv"; // Ensure this file exists!
 $employeeData = array_map('str_getcsv', file($csvFile));
 
 // Find the employee by UID

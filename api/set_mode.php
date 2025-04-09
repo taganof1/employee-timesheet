@@ -14,7 +14,7 @@ if (!in_array($mode, ['clockIn', 'clockOut'])) {
 }
 
 // Write the mode to a file that the Python script can read
-$modeFile = __DIR__ . '/current_mode.txt';
+$modeFile = __DIR__ . '/../current_mode.txt';
 file_put_contents($modeFile, $mode);
 
 // Return success response

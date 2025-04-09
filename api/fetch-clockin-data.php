@@ -1,10 +1,10 @@
 <?php
 header('Content-Type: application/json');
-include 'db_connection.php';
+include '../includes/db_connection.php';
 
 // Function to check if employee exists in data.csv
 function checkEmployeeExists($uid) {
-    $filePath = __DIR__ . '/employee-data/data.csv';
+    $filePath = __DIR__ . '/../employee-data/data.csv';
     if (!file_exists($filePath)) {
         error_log("Data file not found: " . $filePath);
         return false;

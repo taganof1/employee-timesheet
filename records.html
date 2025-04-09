@@ -108,7 +108,7 @@
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('errorMessage');
 
-            fetch('fetch_records.php', {
+            fetch('api/fetch_records.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -136,7 +136,7 @@
         }
 
         function logout() {
-            fetch('logout.php')
+            fetch('includes/logout.php')
             .then(() => {
                 document.getElementById('loginForm').classList.remove('hide');
                 document.getElementById('loginForm').classList.add('show');
@@ -147,7 +147,7 @@
         }
 
         function loadRecords() {
-            fetch('fetch_records.php')
+            fetch('api/fetch_records.php')
                 .then(response => {
                     if (response.status === 401) {
                         throw new Error('Unauthorized');

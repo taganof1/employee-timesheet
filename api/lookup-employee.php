@@ -11,7 +11,7 @@ if ($uid === '') {
     exit;
 }
 
-$filePath = __DIR__ . '/employee-data/data.csv';
+$filePath = __DIR__ . '/../employee-data/data.csv';
 if (!file_exists($filePath)) {
     echo json_encode([
         'status' => 'error',

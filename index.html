@@ -134,7 +134,7 @@
             }
             
             // Send mode change to the server
-            fetch('set_mode.php', {
+            fetch('api/set_mode.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -242,7 +242,7 @@
             console.log('Polling for updates...');
             
             // Determine which endpoint to call based on current action
-            const endpoint = currentAction === 'clockIn' ? 'fetch-clockin-data.php' : 'clock_out.php';
+            const endpoint = currentAction === 'clockIn' ? 'api/fetch-clockin-data.php' : 'api/clock_out.php';
             
             fetch(endpoint)
                 .then(response => {

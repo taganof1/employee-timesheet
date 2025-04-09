@@ -1,6 +1,6 @@
 <?php
 // Read configuration from JSON file
-$configFile = __DIR__ . '/config.json';
+$configFile = __DIR__ . '/../config/config.json';
 if (!file_exists($configFile)) {
     die("Configuration file not found");
 }

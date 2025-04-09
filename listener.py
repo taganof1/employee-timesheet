@@ -7,8 +7,8 @@ import os
 # --- Configuration ---
 SERIAL_PORT = 'COM3'  # Change this to match your Arduino's port
 BAUD_RATE = 115200
-CLOCK_IN_ENDPOINT = 'http://localhost/clocking-system/upload.php'  # Endpoint for clock-in
-CLOCK_OUT_ENDPOINT = 'http://localhost/clocking-system/clock_out.php'  # Endpoint for clock-out
+CLOCK_IN_ENDPOINT = 'http://localhost/clocking-system/api/upload.php'  # Endpoint for clock-in
+CLOCK_OUT_ENDPOINT = 'http://localhost/clocking-system/api/clock_out.php'  # Endpoint for clock-out
 MODE_FILE = 'current_mode.txt'  # File to read the current mode from
 
 # --- Start serial connection ---
