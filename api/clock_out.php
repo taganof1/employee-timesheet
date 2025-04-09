@@ -6,9 +6,25 @@ header('Content-Type: application/json');
 
 // Check if this is a direct request or a polling request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Direct request - get the UID from the request body
-    $data = json_decode(file_get_contents('php://input'), true);
-    $uid = $data['uid'] ?? '';
+    // Debug logging
+    error_log("Clock out request received");
+    error_log("Content-Type: " . ($_SERVER["CONTENT_TYPE"] ?? 'not set'));
+    error_log("POST data: " . print_r($_POST, true));
+    error_log("Raw input: " . file_get_contents('php://input'));
+
+    // Check if the request is JSON or form data
+    $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
+    
+    if (strpos($contentType, "application/json") !== false) {
+        // JSON request
+        $data = json_decode(file_get_contents('php://input'), true);
+        $uid = $data['uid'] ?? '';
+        error_log("Processing JSON request. UID: " . $uid);
+    } else {
+        // Form data request
+        $uid = $_POST['uid'] ?? '';
+        error_log("Processing form data request. UID: " . $uid);
+    }
 } else {
     // Polling request - check for new UID in the database
     // This would be similar to how fetch-clockin-data.php works
@@ -27,6 +43,9 @@ if (empty($uid)) {
 }
 
 try {
+    // Debug logging for SQL query
+    error_log("Looking for clock-in record with UID: " . $uid);
+    
     // First, find the most recent clock-in record for this UID that hasn't been clocked out
     $findQuery = "SELECT id, employee_id, first_name, last_name, clocked_in_at 
                   FROM employee_clocking 
@@ -40,6 +59,7 @@ try {
     $result = $stmt->get_result();
     
     if ($result->num_rows === 0) {
+        error_log("No active clock-in found for UID: " . $uid);
         http_response_code(404);
         echo json_encode([
             'status' => 'error',
@@ -49,6 +69,7 @@ try {
     }
     
     $record = $result->fetch_assoc();
+    error_log("Found record: " . print_r($record, true));
     
     // Update the record with clock-out time
     $updateQuery = "UPDATE employee_clocking 

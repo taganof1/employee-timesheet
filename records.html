@@ -169,7 +169,8 @@
                             const diffMs = clockOutTime - clockInTime;
                             const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
                             const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                            duration = `${diffHrs}h ${diffMins}m`;
+                            const diffSecs = Math.floor((diffMs % (1000 * 60)) / 1000);
+                            duration = `${diffHrs}h ${diffMins}m ${diffSecs}s`;
                         }
                         
                         row.innerHTML = `

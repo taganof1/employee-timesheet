@@ -65,11 +65,16 @@ try:
                 if current_mode == "clockIn":
                     # For clock-in, use form data
                     payload = {'uid': uid}
+                    print(f"Sending clock-in request with payload: {payload}")
                     response = requests.post(endpoint, data=payload)
                 else:
-                    # For clock-out, use JSON
+                    # For clock-out, use form data (same as clock-in)
                     payload = {'uid': uid}
-                    response = requests.post(endpoint, json=payload)
+                    print(f"Sending clock-out request with payload: {payload}")
+                    response = requests.post(endpoint, data=payload)
+
+                print(f"Response status code: {response.status_code}")
+                print(f"Response content: {response.text}")
 
                 if response.status_code == 200:
                     try:
@@ -79,6 +84,8 @@ try:
                                 print(f"✅ Employee {result['name']} (ID: {result['employee_id']}) clocked in successfully!")
                             else:
                                 print(f"✅ Employee {result['data']['employeeName']} (ID: {result['data']['employeeId']}) clocked out successfully!")
+                                print(f"   Clocked in at: {result['data']['clockedInAt']}")
+                                print(f"   Clocked out at: {result['data']['clockedOutAt']}")
                         else:
                             print(f"⚠️ Error: {result['message']}")
                     except requests.exceptions.JSONDecodeError:

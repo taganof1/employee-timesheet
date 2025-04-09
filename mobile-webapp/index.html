@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Clocking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        .uid-display {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f0f8f0;
+            border: 2px dashed #4CAF50;
+            border-radius: 8px;
+        }
+        #uidText {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1B5E20;
+        }
+        .instructions {
+            margin: 20px 0;
+        }
+        .instructions p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Clocking System</h1>
+        
+        <div class="uid-display">
+            <h2>Your UID</h2>
+            <p id="uidText">743E0304</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Use</h3>
+            <p>1. Enable NFC on your phone</p>
+            <p>2. Tap your phone on the NFC reader</p>
+            <p>3. Your UID will be sent to the system</p>
+        </div>
+    </div>
+    
+    <script>
+        // Static UID for the user
+        const STATIC_UID = "743E0304";
+        
+        // Display the static UID
+        document.getElementById('uidText').textContent = STATIC_UID;
+        
+        // Check if Web NFC is supported
+        if ('NDEFReader' in window) {
+            setupNFC();
+        } else {
+            alert("NFC is not supported on this device or browser. Please use Chrome on Android.");
+        }
+        
+        // Setup NFC functionality
+        async function setupNFC() {
+            try {
+                const ndef = new NDEFReader();
+                await ndef.scan();
+                
+                ndef.addEventListener("reading", ({ message, serialNumber }) => {
+                    // This is when the NFC reader reads our phone
+                    alert("NFC detected! Sending UID: " + STATIC_UID);
+                    
+                    // Send the UID to the server
+                    sendUidToServer(STATIC_UID);
+                });
+            } catch (error) {
+                console.error("NFC Setup Error:", error);
+                alert("Could not initialize NFC. Please check your settings.");
+            }
+        }
+        
+        // Send UID to the server
+        function sendUidToServer(uid) {
+            // Create a form data object
+            const formData = new FormData();
+            formData.append('uid', uid);
+            
+            // Send the data to the server using a relative path
+            fetch('upload.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                alert("UID sent successfully!");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Error sending UID. Please try again.");
+            });
+        }
+    </script>
+</body>
+</html> 

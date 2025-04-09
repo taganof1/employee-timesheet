@@ -20,8 +20,8 @@ foreach ($employeeData as $row) {
         $first_name = $row[2];
         $last_name = $row[3];
 
-        // Insert into database
-        $stmt = $conn->prepare("INSERT INTO employee_clocking (uid, employee_id, first_name, last_name) VALUES (?, ?, ?, ?)");
+        // Insert into database with explicit column list
+        $stmt = $conn->prepare("INSERT INTO employee_clocking (uid, employee_id, first_name, last_name, clocked_in_at) VALUES (?, ?, ?, ?, NOW())");
         $stmt->bind_param("siss", $uid, $employee_id, $first_name, $last_name);
 
         if ($stmt->execute()) {
