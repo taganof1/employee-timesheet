@@ -4,5 +4,8 @@
         "username": "clockadmin",
         "password": "[@ttVD_Y*_R_@u!E",
         "dbname": "clocking_system"
+    },
+    "admin": {
+        "password_hash": "$2y$10$f23YPGKy5Wl02\/WQ0ry.3OWienLJds9prV9P.Y3CLS9uqoDPQkG16"
     }
-} 
+}

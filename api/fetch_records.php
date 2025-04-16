@@ -11,11 +11,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $password = $data['password'] ?? '';
     
-    // This should be replaced with your actual secure password
-    // In a production environment, this should be stored securely and hashed
-    $correctPassword = "admin123"; // Replace this with your desired password
+    // Read the config file
+    $configFile = __DIR__ . '/../config/config.json';
+    if (!file_exists($configFile)) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Configuration file not found']);
+        exit;
+    }
     
-    if ($password === $correctPassword) {
+    $config = json_decode(file_get_contents($configFile), true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Error reading configuration file']);
+        exit;
+    }
+    
+    // Verify the password
+    if (password_verify($password, $config['admin']['password_hash'])) {
         $_SESSION['authenticated'] = true;
         echo json_encode(['success' => true]);
     } else {
