@@ -1,34 +1,33 @@
 <?php
 require_once '../includes/db_connection.php';
 
-// Set headers for JSON response
 header('Content-Type: application/json');
 
-// Check if this is a direct request or a polling request
+// Check if request is direct or polling
+// Direct is one time, Polling is continuous requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Debug logging
+    // Debugging output
     error_log("Clock out request received");
     error_log("Content-Type: " . ($_SERVER["CONTENT_TYPE"] ?? 'not set'));
     error_log("POST data: " . print_r($_POST, true));
     error_log("Raw input: " . file_get_contents('php://input'));
 
-    // Check if the request is JSON or form data
+    // Check if data is JSON or form data
+    // Some data from arduino may be sent as JSON rather than form data (depending on mode)
     $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
     
     if (strpos($contentType, "application/json") !== false) {
-        // JSON request
+        // Decode JSON data
         $data = json_decode(file_get_contents('php://input'), true);
         $uid = $data['uid'] ?? '';
         error_log("Processing JSON request. UID: " . $uid);
     } else {
-        // Form data request
+        // Form data
         $uid = $_POST['uid'] ?? '';
         error_log("Processing form data request. UID: " . $uid);
     }
 } else {
-    // Polling request - check for new UID in the database
-    // This would be similar to how fetch-clockin-data.php works
-    // For now, we'll just return a simple response
+    // If not a POST request, return waiting status
     echo json_encode([
         'status' => 'waiting',
         'message' => 'Waiting for RFID card to be scanned'
@@ -43,10 +42,11 @@ if (empty($uid)) {
 }
 
 try {
-    // Debug logging for SQL query
+    // Debugging
+    // SQL output
     error_log("Looking for clock-in record with UID: " . $uid);
     
-    // First, find the most recent clock-in record for this UID that hasn't been clocked out
+    // Find clock in record relating to UID from card scan
     $findQuery = "SELECT id, employee_id, first_name, last_name, clocked_in_at 
                   FROM employee_clocking 
                   WHERE uid = ? AND clocked_out_at IS NULL 
@@ -71,7 +71,7 @@ try {
     $record = $result->fetch_assoc();
     error_log("Found record: " . print_r($record, true));
     
-    // Update the record with clock-out time
+    // Update record with clock-out time
     $updateQuery = "UPDATE employee_clocking 
                    SET clocked_out_at = NOW() 
                    WHERE id = ?";

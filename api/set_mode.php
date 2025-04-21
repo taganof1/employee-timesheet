@@ -1,8 +1,8 @@
 <?php
-// Set headers for JSON response
+
 header('Content-Type: application/json');
 
-// Get the mode from the request
+// Get clock in or clokc out mode from request
 $data = json_decode(file_get_contents('php://input'), true);
 $mode = $data['mode'] ?? '';
 
@@ -13,10 +13,10 @@ if (!in_array($mode, ['clockIn', 'clockOut'])) {
     exit;
 }
 
-// Write the mode to a file that the Python script can read
+// Write mode to file for listener.py to use
 $modeFile = __DIR__ . '/../current_mode.txt';
 file_put_contents($modeFile, $mode);
 
-// Return success response
+// Debugging (Return success response)
 echo json_encode(['status' => 'success', 'message' => "Mode set to $mode"]);
 ?> 

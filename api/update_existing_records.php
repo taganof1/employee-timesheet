@@ -1,4 +1,10 @@
 <?php
+// OBSOLITE FILE
+// This file is no longer used in the current version of the application.
+// It was used to update existing records in the database to set the source to 'rfid'.
+// The current version uses a different approach to handle clock-in and clock-out records.
+// This file is kept for reference and may be removed in future versions.
+
 include '../includes/db_connection.php';
 
 // Update all existing records to have source = 'rfid'

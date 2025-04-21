@@ -2,7 +2,6 @@
 session_start();
 require_once '../includes/db_connection.php';
 
-// Set headers for JSON response
 header('Content-Type: application/json');
 
 // Check if user is authenticated
@@ -12,7 +11,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     exit;
 }
 
-// Get the record ID from the URL
+// Get record ID from URL
 $recordId = $_GET['id'] ?? null;
 if (!$recordId) {
     http_response_code(400);
@@ -20,11 +19,11 @@ if (!$recordId) {
     exit;
 }
 
-// Get the request data
+// Get request data
 $data = json_decode(file_get_contents('php://input'), true);
 
 try {
-    // Prepare the update query
+    // Set Update query
     $query = "UPDATE employee_clocking 
               SET employee_id = ?, 
                   first_name = ?, 

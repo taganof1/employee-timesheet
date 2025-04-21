@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize NFC adapter
+        // Initialize NFC
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter == null) {
             Toast.makeText(this, "NFC is not available on this device.", Toast.LENGTH_LONG).show();
@@ -29,12 +29,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Create a PendingIntent for NFC intent
+        // Create a PendingIntent for NFC
         pendingIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
-        // Display the static UID
+        // Display UID
+        // Used for demonstration purposes
         TextView uidTextView = findViewById(R.id.uidTextView);
         uidTextView.setText("Your UID: " + STATIC_UID);
     }

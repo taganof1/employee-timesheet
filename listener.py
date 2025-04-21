@@ -5,8 +5,8 @@ import json
 import os
 
 # --- Configuration ---
-SERIAL_PORT = 'COM3'  # Change this to match your Arduino's port
-BAUD_RATE = 115200
+SERIAL_PORT = 'COM3'  # Change this to match your Arduino's port (e.g., '/dev/ttyUSB0' for Linux)
+BAUD_RATE = 115200 # Baud rate for Arduino (change based on your baud rate)
 CLOCK_IN_ENDPOINT = 'http://localhost/clocking-system/api/upload.php'  # Endpoint for clock-in
 CLOCK_OUT_ENDPOINT = 'http://localhost/clocking-system/api/clock_out.php'  # Endpoint for clock-out
 MODE_FILE = 'current_mode.txt'  # File to read the current mode from
@@ -21,7 +21,7 @@ print("Press Ctrl+C to stop")
 # Default to clock-in mode
 current_mode = "clockIn"
 
-# Function to read the current mode from the file
+# Read current mode from file
 def read_mode():
     global current_mode
     try:
@@ -38,7 +38,7 @@ def read_mode():
 
 try:
     while True:
-        # Check for mode changes
+        # Check for mode change (clockIn/clockOut)
         read_mode()
         
         if ser.in_waiting > 0:
@@ -52,7 +52,7 @@ try:
                     print(f"Mode changed to: {current_mode}")
                 continue
                 
-            # Process UID data
+            # Process UID
             if data_line.startswith("UID Value:"):
                 uid = data_line.split(": ")[1].replace(" ", "")
                 print(f"UID received: {uid}")
@@ -60,7 +60,8 @@ try:
                 # Determine which endpoint to use based on current mode
                 endpoint = CLOCK_IN_ENDPOINT if current_mode == "clockIn" else CLOCK_OUT_ENDPOINT
                 print(f"Sending to {endpoint} in {current_mode} mode")
-
+            #Occasionally, the UID might be sent as JSON instead of form data
+            #This is checked in the api files and handed accordingly by converting the JSON data to a string
                 # Send UID to PHP for database storage
                 if current_mode == "clockIn":
                     # For clock-in, use form data
@@ -93,7 +94,7 @@ try:
                 else:
                     print(f"⚠️ Failed to send UID to PHP. Status code: {response.status_code}")
         
-        # Small delay to prevent CPU overuse
+        # Small delay to prevent CPU overuse and keep the loop responsive
         time.sleep(0.1)
 
 except KeyboardInterrupt:

@@ -2,17 +2,16 @@
 session_start();
 require_once '../includes/db_connection.php';
 
-// Set headers for JSON response
 header('Content-Type: application/json');
 
-// Check if user is authenticated
+// Check if user exists
 if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
     exit;
 }
 
-// Get the request data
+// Get JSON data
 $data = json_decode(file_get_contents('php://input'), true);
 $recordIds = $data['recordIds'] ?? [];
 
@@ -23,10 +22,10 @@ if (empty($recordIds)) {
 }
 
 try {
-    // Create a comma-separated list of placeholders
+    // Create list of placeholders for prepared statement
     $placeholders = str_repeat('?,', count($recordIds) - 1) . '?';
     
-    // Prepare and execute the delete query
+    // Delete record
     $query = "DELETE FROM employee_clocking WHERE id IN ($placeholders)";
     $stmt = $conn->prepare($query);
     

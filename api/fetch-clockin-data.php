@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 include '../includes/db_connection.php';
 
-// Function to check if employee exists in data.csv
+// Check if employee exists in data.csv
 function checkEmployeeExists($uid) {
     $filePath = __DIR__ . '/../employee-data/data.csv';
     if (!file_exists($filePath)) {
@@ -11,7 +11,7 @@ function checkEmployeeExists($uid) {
     }
 
     $rows = array_map('str_getcsv', file($filePath));
-    array_shift($rows); // Skip header row
+    array_shift($rows); // Skip first row (headers)
 
     foreach ($rows as $row) {
         $csvUid = trim($row[0], '"');
@@ -19,11 +19,12 @@ function checkEmployeeExists($uid) {
             return true;
         }
     }
+    // Debugging
     error_log("UID not found in data.csv: " . $uid);
     return false;
 }
 
-// Query to fetch latest clock-in data
+// Fetch latest clock-in record
 $sql = "SELECT id, uid, employee_id, first_name, last_name, clocked_in_at FROM employee_clocking ORDER BY clocked_in_at DESC LIMIT 1";
 $result = $conn->query($sql);
 
@@ -31,7 +32,7 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     error_log("Latest clock-in UID: " . $row['uid']);
     
-    // Check if employee exists in data.csv
+    // If employee exists in CSV return success response (mainly for debugging)
     if (checkEmployeeExists($row['uid'])) {
         $response = [
             'status' => 'success',

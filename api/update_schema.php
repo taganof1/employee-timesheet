@@ -1,10 +1,14 @@
 <?php
 include '../includes/db_connection.php';
 
-// Read the SQL update
-$sql = file_get_contents(__DIR__ . '/update_schema.sql');
+// Read SQL update
+$sql = file_get_contents(__DIR__ . '/update_schema.sql'); //DIR used to get the absolute path to the file
+if ($sql === false) {
+    die("Error reading SQL file");
+}
+// Debugging (Check SQL statements execution)
 
-// Split the SQL into individual statements
+// Split SQL into individual statements
 $statements = array_filter(array_map('trim', explode(';', $sql)));
 
 $success = true;

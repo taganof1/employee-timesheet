@@ -1,26 +1,26 @@
 <?php
 include '../includes/db_connection.php';
 
-// Check if UID is sent
+// Check UID is sent
 if (!isset($_POST['uid'])) {
     die(json_encode(["status" => "error", "message" => "No UID received"]));
 }
 
 $uid = $_POST['uid'];
 
-// Read employee data from the CSV
-$csvFile = __DIR__ . "/../employee-data/data.csv"; // Ensure this file exists!
+// Read employee data from data.csv
+$csvFile = __DIR__ . "/../employee-data/data.csv";
 $employeeData = array_map('str_getcsv', file($csvFile));
 
-// Find the employee by UID
+// Find employee by UID
 $found = false;
 foreach ($employeeData as $row) {
-    if ($row[0] === $uid) { // UID matches
+    if ($row[0] === $uid) { // IF UID matches
         $employee_id = $row[1];
         $first_name = $row[2];
         $last_name = $row[3];
 
-        // Insert into database with explicit column list
+        // Insert into database
         $stmt = $conn->prepare("INSERT INTO employee_clocking (uid, employee_id, first_name, last_name, clocked_in_at) VALUES (?, ?, ?, ?, NOW())");
         $stmt->bind_param("siss", $uid, $employee_id, $first_name, $last_name);
 

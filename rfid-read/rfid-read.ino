@@ -2,7 +2,7 @@
 #include <Adafruit_PN532.h>
 
 #define PN532_IRQ   (2)
-#define PN532_RESET (3)  // Not always needed, but define it anyway
+#define PN532_RESET (3)  // Not always needed, but define it anyway depending on setup
 #define BUTTON_PIN  (4)  // Button pin for mode switching
 
 Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
@@ -55,9 +55,6 @@ void loop(void) {
       // Send mode change to Python script
       Serial.print("MODE:");
       Serial.println(clockInMode ? "clockIn" : "clockOut");
-      
-      // Visual feedback (optional - if you have an LED)
-      // digitalWrite(LED_PIN, clockInMode ? HIGH : LOW);
     }
   }
 

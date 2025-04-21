@@ -1,4 +1,6 @@
 <?php
+// This script is used exclusively for the mobile web app.
+
 // Set headers to allow cross-origin requests
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");

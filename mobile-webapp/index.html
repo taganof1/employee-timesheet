@@ -82,7 +82,6 @@
                 await ndef.scan();
                 
                 ndef.addEventListener("reading", ({ message, serialNumber }) => {
-                    // This is when the NFC reader reads our phone
                     alert("NFC detected! Sending UID: " + STATIC_UID);
                     
                     // Send the UID to the server
