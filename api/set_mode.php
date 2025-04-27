@@ -2,7 +2,7 @@
 
 header('Content-Type: application/json');
 
-// Get clock in or clokc out mode from request
+// Get clock in or clock out mode from request
 $data = json_decode(file_get_contents('php://input'), true);
 $mode = $data['mode'] ?? '';
 
