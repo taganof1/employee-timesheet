@@ -1,11 +1,11 @@
 {
     "database": {
         "host": "localhost",
-        "username": "clockadmin",
-        "password": "[@ttVD_Y*_R_@u!E",
+        "username": "",
+        "password": "",
         "dbname": "clocking_system"
     },
     "admin": {
-        "password_hash": "$2y$10$f23YPGKy5Wl02\/WQ0ry.3OWienLJds9prV9P.Y3CLS9uqoDPQkG16"
+        "password_hash": "$2y$12$N5RoMZRLcs2JN1fqa0aDb.6Qfgu.mndISGdAI5H7.ZQpkcm8PDe9."
     }
 }

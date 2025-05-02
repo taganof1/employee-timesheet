@@ -169,6 +169,13 @@
 
         // Function to show error state
         function showErrorState(message) {
+            // If the message indicates no records found, just return to welcome screen
+            if (message.includes('No active clock-in found') || message.includes('No recent clock-in records found')) {
+                showWelcomeScreen();
+                return;
+            }
+            
+            // For other errors, show the error message
             statusCard.classList.remove('success');
             statusCard.classList.add('error');
             statusCard.querySelector('.card-icon').className = 'fas fa-exclamation-circle card-icon text-danger';
